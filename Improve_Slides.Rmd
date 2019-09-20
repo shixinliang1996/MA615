@@ -1,0 +1,179 @@
+---
+title: "Improved Slides"
+author: "Shixin Liang"
+date: "9/20/2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(knitr)                ## loading the entire knitr package
+library(ggplot2)              ## the only tidyverse library you need is ggplot2
+library(esquisse)             ## use esquisse to setup the basic plots
+
+library(kableExtra)
+library(magrittr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Class assignment:{.smaller}  
+
+Using the MPG dataset, which is available with the ggplot2 library, produce a document that includes the following elements: headers, text, tables, and plots.  
+
+Tables should include a comparison of city and highway mileage by the class of car and the best three car models for city and highway mileage for all the years in which data is available.  
+
+Plot the data displaying as much of the data as you can. Put continuous variables on the axes and include a locally smoothed regression line to show the relationship with mileage.  Also make a box plot comparing city and highway MPG by class of car.  
+
+
+## Table 1 {.smaller}  
+
+This example is flawed even though the code works.  Explain.
+And now that you know how to produce the table can you improve the code 
+by using an **apply** functional?
+
+Explain: This example is flawed because it uses a for loop, which runs very slow in R. It can be improved by using a tapply functional. 
+
+```{r include=TRUE}
+  
+
+data(mpg)    ## load the data
+class <- factor(mpg$class)
+cty_mean <- tapply(mpg$cty, class, mean)    ##use tapply() instead of for loop
+hwy_mean <- tapply(mpg$hwy, class, mean)
+
+cty_mean <- round(cty_mean, 2)    ## round the results to 2 decimal pla
+hwy_mean <- round(hwy_mean, 2)
+
+class <- unique(mpg$class) 
+tbl_1 <- cbind(cty_mean,hwy_mean)   ## form an array for the table
+
+kable(tbl_1, format = "latex", booktabs=TRUE, digits = 2,    ## call kable to make the table
+      col.names = c("City", "Highway"), 
+      caption = "Mean City and Highway MPG by Car Class" )     
+knitr::kable(tbl_1)
+```
+
+## Table 2 {.smaller}  
+The next table is a bit tricky. 
+
+```{r include=TRUE}
+  
+
+##  You probably want to get started with a little investigation. 
+##  Using unique(mpg$year), you find out that there are only two years - 1999, 2008.
+
+
+mod_99 <- unique(mpg$model[mpg$year=='1999'])  ## vector of models in 1999
+
+mod_08 <- unique(mpg$model[mpg$year=='2008'])  ## vector of models in 2008
+ 
+
+mod_99_cty_mean <- tapply(mpg$cty[mpg$year=='1999'], mpg$model[mpg$year=='1999'], mean) 
+mod_08_cty_mean <- tapply(mpg$cty[mpg$year=='2008'], mpg$model[mpg$year=='2008'], mean) 
+mod_99_hwy_mean <- tapply(mpg$hwy[mpg$year=='1999'], mpg$model[mpg$year=='1999'], mean) 
+mod_08_hwy_mean <- tapply(mpg$hwy[mpg$year=='2008'], mpg$model[mpg$year=='2008'], mean) 
+
+
+ind_srt_99_cty <- order(mod_99_cty_mean)
+miles_cty_99 <- rev(mod_99_cty_mean[ind_srt_99_cty])
+#row.names(miles_cty_99)
+
+ind_srt_08_cty <- order(mod_08_cty_mean)
+miles_cty_08 <- rev(mod_08_cty_mean[ind_srt_08_cty])
+#row.names(miles_cty_08)
+
+ind_srt_99_hwy <- order(mod_99_hwy_mean)
+miles_hwy_99 <- rev(mod_99_hwy_mean[ind_srt_99_hwy])
+#row.names(miles_hwy_99)
+
+ind_srt_08_hwy <- order(mod_08_hwy_mean)
+miles_hwy_08 <- rev(mod_08_hwy_mean[ind_srt_08_hwy])
+#row.names(miles_hwy_08)
+
+miles_cty_08 <- round(miles_cty_08, 2)
+miles_cty_99 <- round(miles_cty_99, 2)
+miles_hwy_08 <- round(miles_hwy_08, 2)
+miles_hwy_99 <- round(miles_hwy_99, 2)
+
+
+tbl_2 <- cbind(miles_cty_99[1:3],
+               row.names(miles_hwy_99)[1:3],
+               miles_hwy_99[1:3],
+               row.names(miles_cty_08)[1:3],
+               miles_cty_08[1:3],
+               row.names(miles_hwy_08)[1:3],
+               miles_hwy_08[1:3])
+
+colnames(tbl_2) <- c("Milage", "", "Milage", "", "Milage", "", "Milage")
+
+kable(tbl_2, digits = 2, format = "latex", booktabs=TRUE, ,caption = "Top 3 MPG Performing Cars: 1999, 2008") %>% kable_styling() %>%
+  add_header_above(c("City 1999"=2, 
+                     "Highway 1999"=2,
+                     "City 2008"=2,
+                   "Highway 2008"=2))
+knitr::kable(tbl_2)
+```
+
+
+## ggplot 1 {.smaller}  
+
+```{r include=TRUE}
+  
+
+library(ggplot2)
+
+ggplot(mpg) +
+ aes(x = displ, y = cty) +
+ geom_point(aes(color=class),size=2) + geom_smooth() +
+ scale_color_hue() +
+ theme_minimal(base_size = 16) +
+ facet_wrap(vars(year)) + 
+  labs(x = "Engine Displacement",y = "City Mileage" ,title = "City MPG by Class of Car: 1999, 2008")
+ 
+##esquisser(mpg)
+
+```
+  
+  
+## ggplot 1 {.smaller}   
+
+```{r include=TRUE}
+ 
+ ggplot(mpg) +
+ aes(x = displ, y = hwy) +
+ geom_point(aes(color=class),size=2) + geom_smooth() +
+ scale_color_hue() +
+ theme_minimal(base_size = 16) +
+ facet_wrap(vars(year)) + 
+  labs(x = "Engine Displacement", y = "Highway Mileage", title = "Highway MPG by Class of Car: 1999, 2008")
+ 
+ ##esquisser(mpg)
+```
+  
+  
+## Boxplot 1 {.smaller}  
+
+```{r echo=FALSE}
+
+
+
+ggplot(mpg) +
+ aes(x = class, y = cty) +
+ geom_boxplot(fill = "#0c4c8a") +
+ theme_minimal(base_size=16) +
+  labs(x = "Car Class", y = "City Mileage", title = "City MPG by Class of Car: 1999, 2008")
+
+
+```
+  
+## Boxplot 1 {.smaller}  
+
+```{r echo=FALSE}
+ggplot(mpg) +
+ aes(x = class, y = hwy) +
+ geom_boxplot(fill = "#0c4c8a") +
+ theme_minimal(base_size=16) +
+  labs(x = "Car Class", y = "Highway Mileage", title = "Highway MPG by Class of Car: 1999, 2008")
+
+
+
+```

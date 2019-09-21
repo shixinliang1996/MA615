@@ -12,7 +12,6 @@ library(esquisse)             ## use esquisse to setup the basic plots
 
 library(kableExtra)
 library(magrittr)
-#opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
@@ -78,33 +77,6 @@ miles_cty_99 <- get_top3(mpg$cty[mpg$year=='1999'],mpg$model[mpg$year=='1999'])
 miles_cty_08 <- get_top3(mpg$cty[mpg$year=='2008'],mpg$model[mpg$year=='2008'])
 miles_hwy_99 <- get_top3(mpg$hwy[mpg$year=='1999'],mpg$model[mpg$year=='1999'])
 miles_hwy_08 <- get_top3(mpg$hwy[mpg$year=='2008'],mpg$model[mpg$year=='2008'])
-
-# mod_99_cty_mean <- tapply(mpg$cty[mpg$year=='1999'], mpg$model[mpg$year=='1999'], mean) 
-# mod_08_cty_mean <- tapply(mpg$cty[mpg$year=='2008'], mpg$model[mpg$year=='2008'], mean) 
-# mod_99_hwy_mean <- tapply(mpg$hwy[mpg$year=='1999'], mpg$model[mpg$year=='1999'], mean) 
-# mod_08_hwy_mean <- tapply(mpg$hwy[mpg$year=='2008'], mpg$model[mpg$year=='2008'], mean) 
-# 
-# 
-# ind_srt_99_cty <- order(mod_99_cty_mean)
-# miles_cty_99 <- rev(mod_99_cty_mean[ind_srt_99_cty])
-# #row.names(miles_cty_99)
-# 
-# ind_srt_08_cty <- order(mod_08_cty_mean)
-# miles_cty_08 <- rev(mod_08_cty_mean[ind_srt_08_cty])
-# #row.names(miles_cty_08)
-# 
-# ind_srt_99_hwy <- order(mod_99_hwy_mean)
-# miles_hwy_99 <- rev(mod_99_hwy_mean[ind_srt_99_hwy])
-# #row.names(miles_hwy_99)
-# 
-# ind_srt_08_hwy <- order(mod_08_hwy_mean)
-# miles_hwy_08 <- rev(mod_08_hwy_mean[ind_srt_08_hwy])
-# #row.names(miles_hwy_08)
-# 
-# miles_cty_08 <- round(miles_cty_08, 2)
-# miles_cty_99 <- round(miles_cty_99, 2)
-# miles_hwy_08 <- round(miles_hwy_08, 2)
-# miles_hwy_99 <- round(miles_hwy_99, 2)
 
 
 tbl_2 <- cbind(miles_cty_99[1:3],
